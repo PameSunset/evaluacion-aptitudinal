@@ -5,11 +5,19 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Estado del Examen</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary: #2563eb;
+            /* Azul original */
+            --bg-body: #f1f5f9;
+            --text-dark: #0f172a;
+            --text-gray: #64748b;
+        }
+
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f1f5f9;
+            background-color: var(--bg-body);
             margin: 0;
             display: flex;
             align-items: center;
@@ -26,13 +34,27 @@
             max-width: 500px;
             padding: 40px;
             text-align: center;
+            /* Pequeña animación de entrada */
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .avatar-circle {
             width: 80px;
             height: 80px;
             background: #dbeafe;
-            color: #2563eb;
+            color: var(--primary);
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -45,12 +67,12 @@
         .user-name {
             font-size: 1.5rem;
             font-weight: 700;
-            color: #0f172a;
+            color: var(--text-dark);
             margin-bottom: 5px;
         }
 
         .user-role {
-            color: #64748b;
+            color: var(--text-gray);
             font-size: 0.95rem;
             margin-bottom: 30px;
         }
@@ -67,7 +89,7 @@
             font-size: 0.8rem;
             text-transform: uppercase;
             letter-spacing: 0.05em;
-            color: #64748b;
+            color: var(--text-gray);
             font-weight: 600;
             margin-bottom: 5px;
         }
@@ -77,7 +99,74 @@
             font-weight: 600;
         }
 
-        /* Botones */
+        /* --- ESTILOS DEL CÍRCULO CON NÚMEROS ADENTRO --- */
+        .score-container {
+            position: relative;
+            /* Clave para centrar */
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 25px;
+        }
+
+        .score-svg {
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg);
+            /* Empieza desde arriba */
+        }
+
+        .circle-bg {
+            fill: none;
+            stroke: #e2e8f0;
+            stroke-width: 12;
+        }
+
+        .circle-progress {
+            fill: none;
+            stroke: var(--primary);
+            /* Color de la barra */
+            stroke-width: 12;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 1.5s ease-out;
+        }
+
+        /* El truco para meter los números dentro */
+        .score-inner-text {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .text-big {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            line-height: 1;
+        }
+
+        .text-small {
+            font-size: 1rem;
+            color: #94a3b8;
+            font-weight: 500;
+            margin-top: 5px;
+        }
+
+        .text-label {
+            font-size: 0.75rem;
+            color: var(--text-gray);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 8px;
+        }
+
+        /* Botones (Originales) */
         .btn-action {
             display: block;
             width: 100%;
@@ -88,7 +177,7 @@
             text-decoration: none;
             cursor: pointer;
             border: none;
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: transform 0.2s;
         }
 
         .btn-start {
@@ -112,19 +201,6 @@
         .btn-logout:hover {
             background: #fef2f2;
         }
-
-        /* Puntuación */
-        .score-circle {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            border: 8px solid #0ea5e9;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 20px;
-        }
     </style>
 </head>
 
@@ -146,7 +222,7 @@
             <% if (estadoUI === "ESPERA") { %>
                 <div class="status-value" style="color: #f59e0b;">⏳ En Espera</div>
                 <p style="font-size: 0.9rem; margin-top: 5px; color: #64748b;">
-                    El administrador aún no habilita el examen para este cargo.
+                    El administrador aún no habilita el examen.
                 </p>
             <% } else if (estadoUI === "FINALIZADO") { %>
                 <div class="status-value" style="color: #10b981;">✅ Finalizado</div>
@@ -157,35 +233,62 @@
             <% } %>
         </div>
 
-        <% if (estadoUI === "FINALIZADO") { %>
-            <div class="score-circle">
-                <span style="font-size: 2.5rem; font-weight: 800; color: #0f172a; line-height: 1;">
-                    <%= puntaje !== null ? puntaje : ' --' %>
-                </span>
-                <span style="font-size: 0.8rem; color: #64748b; font-weight: 600;">PUNTOS</span>
-        </div>
-        <p style="color: #64748b; font-size: 0.9rem; margin-bottom: 20px;">
-            Gracias por completar la evaluación. Tus resultados han sido registrados.
-        </p>
+        <% if (estadoUI === "FINALIZADO") { 
+            /* Cálculos para la barra circular */
+            const radio = 80;
+            const circunferencia = 2 * Math.PI * radio; // aprox 502
+            let nota = puntaje !== null ? puntaje : 0;
+            let total = puntajeTotal;
+            let porcentaje = (nota / total);
+            /* Dashoffset: Si porcentaje es 1 (100%), offset es 0. Si es 0, offset es circunferencia */
+            let offset = circunferencia - (porcentaje * circunferencia);
+        %>
+            <div class="score-container">
+                <svg class="score-svg">
+                    <circle cx="100" cy="100" r="<%= radio %>" class="circle-bg" />
+                    <circle cx="100" cy="100" r="<%= radio %>" class="circle-progress" 
+                            style="stroke-dasharray: <%= circunferencia %>; stroke-dashoffset: <%= offset %>;" />
+                </svg>
+
+                <div class="score-inner-text">
+                    <span class="text-big"><%= nota %></span>
+                    <span class="text-small">/ <%= total %></span>
+                    <span class="text-label">PUNTOS</span>
+                </div>
+            </div>
+
+            <p style="color: #64748b; font-size: 0.9rem; margin-top: 15px; margin-bottom: 20px;">
+                Gracias por completar la evaluación.<br>Tus resultados han sido registrados.
+            </p>
         <% } %>
 
-            <% if (estadoUI==="INICIAR" ) { %>
-                <a href="/postulante/examen" class="btn-action btn-start">
-                    Comenzar Examen
-                </a>
-                <% } %>
 
-                    <% if (estadoUI==="REANUDAR" ) { %>
-                        <a href="/postulante/examen" class="btn-action btn-start">
-                            Reanudar Evaluación
-                        </a>
-                        <% } %>
+        <% if (estadoUI === "INICIAR") { %>
+            <a href="/postulante/examen" class="btn-action btn-start">Comenzar Examen</a>
+        <% } %>
 
-                            <form action="/logout" method="POST">
-                                <button class="btn-action btn-logout" type="submit">Cerrar Sesión</button>
-                            </form>
+        <% if (estadoUI === "REANUDAR") { %>
+            <a href="/postulante/examen" class="btn-action btn-start">Reanudar Evaluación</a>
+        <% } %>
+
+        <form action="/logout" method="POST">
+            <button class="btn-action btn-logout" type="submit">Cerrar Sesión</button>
+        </form>
 
     </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const progressCircle = document.querySelector(' .circle-progress'); if (progressCircle) { // Guardamos el
+                valor final calculado por el servidor const finalOffset = progressCircle.style.strokeDashoffset; // 1.
+                Ponemos la barra vacía(offset máximo) // 2 * PI * 80 ≈ 502.65
+                progressCircle.style.strokeDashoffset = 503; // 2. Pequeño timeout para permitir que el navegador pinte el
+                estado vacío setTimeout(() => {
+                    progressCircle.style.strokeDashoffset = finalOffset;
+                }, 100);
+            }
+        });
+    </script>
 
 </body>
 
