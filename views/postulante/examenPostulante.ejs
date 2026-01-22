@@ -5,6 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Examen en Curso</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text x=%2250%22 y=%2275%22 font-size=%2270%22 text-anchor=%22middle%22>🧠</text></svg>">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         /* --- ESTILOS GENERALES --- */
@@ -450,7 +451,7 @@
             }
 
             // Si todo está ok, pedimos confirmación
-            const confirma = confirm("¿Confirmas que deseas finalizar tu examen?");
+            const confirma = confirm("Declaro que las respuestas registradas en esta encuesta han sido consignadas de manera consciente y responsable, reflejan mi criterio y experiencia, y confirmo que estoy seguro(a) de las respuestas proporcionadas y autorizo su envío definitivo");
             if (confirma) {
                 examenEnviado = true; // ACTIVAMOS LA BANDERA PARA QUE NO SALTE LA ALERTA DE PESTAÑA
             }
@@ -487,7 +488,7 @@
             if (examenEnviado) return;
 
             if (document.visibilityState !== 'visible') {
-                alert("⚠️ ¡Atención! No debes cambiar de pestaña durante el examen");
+                alert("⚠️¡Atención! No debes cambiar de pestaña durante el examen");
             }
         });
 
