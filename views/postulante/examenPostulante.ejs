@@ -227,14 +227,16 @@
                     </div>
 
                     <% p.opciones.forEach((o)=> { %>
-                        <label class="option-label">
-                            <input type="radio" name="preg_<%= p.id_pregunta %>" value="<%= o.opcion_num %>"
-                                class="option-input" <% if (p.opcion_elegida==o.opcion_num) { %> checked <% } %>>
-                                <span class="option-content">
-                                    <%= o.opcion_texto %>
-                                </span>
-                        </label>
-                        <% }) %>
+                        <% if (o.opcion_texto.trim() !== "") { %>
+                            <label class="option-label">
+                                <input type="radio" name="preg_<%= p.id_pregunta %>" value="<%= o.opcion_num %>"
+                                    class="option-input" <% if (p.opcion_elegida==o.opcion_num) { %> checked <% } %>>
+                                    <span class="option-content">
+                                        <%= o.opcion_texto %>
+                                    </span>
+                            </label>
+                        <% } %>
+                    <% }) %>
                 </div>
                 <% }) %>
         </div>
